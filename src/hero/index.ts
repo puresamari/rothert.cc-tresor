@@ -5,10 +5,20 @@ const logoSize = {
   height: 114,
 };
 
+const arrow = new Path2D("M4.5 4L101 100.5L197.5 4");
+const arrowSize = {
+  width: 202,
+  height: 108,
+};
+
 export class Hero {
   ctx: CanvasRenderingContext2D;
   path2D = new Path2D(svgPath);
-  size: [number, number] = [window.innerWidth, window.innerHeight];
+  size: [number, number] = [window.innerWidth * 2, window.innerHeight * 2];
+
+  get Ratio() {
+    return window.devicePixelRatio;
+  }
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.ctx = canvas.getContext("2d");
@@ -25,7 +35,10 @@ export class Hero {
 
   resize() {
     this.before = 0;
-    this.size = [window.innerWidth, window.innerHeight];
+    this.size = [
+      window.innerWidth * this.Ratio,
+      window.innerHeight * this.Ratio,
+    ];
     const [width, height] = this.size;
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, width, height);
@@ -43,16 +56,15 @@ export class Hero {
     const scaleY = height / logoSize.height;
     const scale = Math.max(1, Math.min(scaleX, scaleY));
     const stepSize = height / 90;
+    // const realStepSize = window.innerHeight / 90;
 
     this.ctx.scale(scale, scale);
     this.ctx.translate(0, height / 2 / scale - logoSize.height / 2);
     this.ctx.translate(0, this.before / scale);
 
-    for (
-      this.before = this.before;
-      this.before <= window.scrollY;
-      this.before += stepSize
-    ) {
+    const y = window.scrollY * this.Ratio;
+
+    for (this.before = this.before; this.before <= y; this.before += stepSize) {
       this.ctx.translate(0, stepSize / scale);
 
       const progress = Math.min(1, this.before / (window.innerHeight / 2));
