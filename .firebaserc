@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "rothert-cc"
+  },
+  "targets": {
+    "rothert-cc": {
+      "hosting": {
+        "bunker": [
+          "bunker-ab615"
+        ]
+      }
+    }
+  }
+}
