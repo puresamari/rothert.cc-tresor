@@ -1,3 +1,4 @@
+import { SceneController } from "./../scene-controller";
 import { Anim } from "./cube";
 import {
   BoxBufferGeometry,
@@ -11,7 +12,8 @@ import {
   WebGLRenderer,
 } from "three";
 
-import { distinctUntilChanged, fromEvent, map, tap } from "rxjs";
+import { fromEvent, merge } from "rxjs";
+import { map, distinctUntilChanged, tap } from "rxjs/operators";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export class Cube {
@@ -24,7 +26,11 @@ export class Cube {
 
   size = [window.innerHeight / 2, window.innerHeight];
 
-  constructor(public readonly canvas = document.createElement("canvas")) {
+  constructor(
+    public readonly canvas: HTMLCanvasElement,
+    sceneCTL: SceneController,
+    variant: number
+  ) {
     const [width, height] = this.size;
 
     this.camera = new PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -49,26 +55,46 @@ export class Cube {
     this.camera.lookAt(0, 0, 0);
     this.update();
 
-    fromEvent(window, "scroll")
+    merge(
+      fromEvent(canvas, "mouseenter").pipe(map(() => 0.5)),
+      fromEvent(canvas, "mousedown").pipe(map(() => 1)),
+      fromEvent(canvas, "mouseup").pipe(map(() => 0.5)),
+      fromEvent(canvas, "mouseleave").pipe(map(() => -1))
+    ).subscribe((v) => {
+      sceneCTL.amplifiedSubject.next(v);
+      canvas.style.transform = `translateY(-50%) scale(${
+        v < 0 ? 1 : 1 + v * 0.2
+      })`;
+    });
+
+    sceneCTL.$scene
       .pipe(
         map((v) => window.scrollY / window.innerHeight),
         map((v) => {
-          if (v < 0.75) {
+          if (v >= 7.5) {
+            const val = Math.max(0, 8 - v);
+            return variant ? val : 1 - val;
+          }
+          if (v < 0.75 || v >= 4) {
             return 0.5;
           }
-          return (-Math.sin((v - 0.75) * 3) + 1) / 2;
+          const multi = Math.min(1, 4 - v);
+          return (
+            ((-Math.sin((v - 0.75) * 3) + 1) / 2) * multi + (1 - multi) * 0.5
+          );
         }),
         distinctUntilChanged((a, b) => a === b),
-        map((v) => window.innerWidth * v - width * v)
+        map((v) => {
+          const container = Math.min(window.innerWidth, 1280);
+          return (
+            (window.innerWidth - container) / 2 + container * v - width * v
+          );
+        })
       )
       .subscribe((v) => (this.canvas.style.left = `${v}px`));
 
-    fromEvent(window, "scroll")
-      .pipe(
-        map((v) => Math.max(0, window.scrollY / window.innerHeight - 1)),
-        map((v) => Math.min(2, v)),
-        distinctUntilChanged((a, b) => a === b)
-      )
+    sceneCTL.$scene
+      .pipe(distinctUntilChanged((a, b) => a === b))
       .subscribe((v) => {
         this.orbit.autoRotateSpeed = v * 10;
         this.cube.mode = v;

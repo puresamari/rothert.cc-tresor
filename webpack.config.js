@@ -18,7 +18,6 @@ const config = {
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
-    open: true,
     host: 'localhost',
   },
   plugins: [
@@ -42,9 +41,17 @@ const config = {
       use: [stylesHandler, 'css-loader', 'postcss-loader'],
     },
     {
-      test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+      test: /\.(eot|svg|ttf|woff|woff2|wav|png|jpg|gif)$/i,
       type: 'asset',
     },
+      //  {
+      //   test: /\.(wav)$/i,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //     },
+      //   ],
+      // },
 
       // Add your rules for custom modules here
       // Learn more about loaders from https://webpack.js.org/loaders/
