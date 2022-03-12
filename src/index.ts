@@ -44,7 +44,19 @@ const cube = new Cube(document.querySelector("canvas#cube"), scene, 0);
 const cube2 = new Cube(document.querySelector("canvas#cube-2"), scene, 1);
 const hero = new Hero(document.querySelector("canvas#hero"), scene);
 
-// const debuggerElle = document.createElement("p");
-// debuggerElle.className = "fixed top-0 left-0 z-50";
-// document.body.appendChild(debuggerElle);
-// scene.$scene.subscribe((v) => (debuggerElle.innerText = `${v}`));
+// @ts-ignore
+if (!IS_PROD) {
+  const debuggerElle = document.createElement("div");
+  const debuggerBeatIndicator = document.createElement("div");
+  debuggerBeatIndicator.className = "h-8 flex bg-red-500";
+  debuggerElle.appendChild(debuggerBeatIndicator);
+  const debuggerBeatScene = document.createElement("p");
+  debuggerElle.appendChild(debuggerBeatScene);
+
+  debuggerElle.className = "fixed top-0 left-0 z-50 w-52 truncate";
+  document.body.appendChild(debuggerElle);
+  scene.$scene.subscribe((v) => (debuggerBeatScene.innerText = `${v}`));
+  scene.$beat.subscribe(
+    (v) => (debuggerBeatIndicator.style.width = `${Math.floor(v * 100)}%`)
+  );
+}

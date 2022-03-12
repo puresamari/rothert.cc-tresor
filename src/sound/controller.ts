@@ -73,6 +73,10 @@ class FilterLoopedSound {
     // this.player.
     // setTimeout(() => this.player.start(0), 1000);
   }
+
+  get IsLoaded() {
+    return this.player.loaded;
+  }
 }
 
 export class SoundController {
@@ -174,9 +178,25 @@ export class SoundController {
       // map((v) => v),
     );
 
-    setTimeout(() => {
+    let interval = setInterval(() => {
+      if (
+        ![
+          this.kick,
+          perc1,
+          perc2,
+          rim,
+          subSimple,
+          subLLong,
+          choir1,
+          fill,
+        ].reduce((all, v) => all && v.IsLoaded, true)
+      ) {
+        return;
+      }
       Tone.Transport.start();
-    }, 1000);
+      scene.startBeat();
+      clearInterval(interval);
+    }, 100);
     // console.log(kick, perc1, perc2);
   }
 }

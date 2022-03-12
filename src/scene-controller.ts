@@ -1,7 +1,13 @@
-import { BehaviorSubject, fromEvent, Observable } from "rxjs";
+import { BehaviorSubject, fromEvent, interval, Observable, timer } from "rxjs";
 import { map, distinctUntilChanged, tap } from "rxjs/operators";
 
 export class SceneController {
+  start: number = -1;
+
+  get TimeSinceStart() {
+    return this.start < 0 ? 0 : Date.now() - this.start;
+  }
+
   private sceneSubject = new BehaviorSubject<number>(
     window.scrollY / window.innerHeight
   );
@@ -14,6 +20,26 @@ export class SceneController {
   public $isAmplified = this.amplifiedSubject.pipe(
     distinctUntilChanged((a, b) => a === b)
   );
+
+  private beatFraction = (1000 * 60) / 140;
+  public $beat = timer(0, 1000 / 60).pipe(map(() => this.Beat));
+
+  getBeatAtTime(t: number) {
+    return (
+      Math.sin(
+        (((this.TimeSinceStart / 60 / 1000) * 140) / 4) * 4 * Math.PI * 2
+      ) /
+        2 +
+      0.5
+    );
+  }
+  get Beat(): number {
+    return this.getBeatAtTime(this.TimeSinceStart);
+    // return this.getBeatAtTime(Date.now());
+  }
+  startBeat() {
+    this.start = Date.now();
+  }
 
   constructor() {
     fromEvent(window, "scroll")

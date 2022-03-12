@@ -46,7 +46,7 @@ export class Cube {
     this.renderer = new WebGLRenderer({ canvas, alpha: true });
     this.renderer.setSize(width, height);
 
-    this.cube = new Anim();
+    this.cube = new Anim(sceneCTL);
     const cube = new Mesh(this.cube, new MeshNormalMaterial({}));
     this.scene.add(cube);
     this.camera.position.z = 10;
