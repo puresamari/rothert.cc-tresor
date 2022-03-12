@@ -1,7 +1,7 @@
 import { combineLatest, Observable } from "rxjs";
 import { map, distinctUntilChanged, tap } from "rxjs/operators";
 import * as Tone from "tone";
-import { Filter, Part, Time, start, Player } from "tone";
+import { Filter, Part, Time, start, Player, Param } from "tone";
 import { SceneController } from "../scene-controller";
 import kickSound from "./sounds/KickNew.wav";
 import perc1Sound from "./sounds/Drums1.wav";
@@ -14,18 +14,23 @@ import choir1Sound from "./sounds/Choir1.wav";
 
 import ease from "rx-ease";
 
+Tone.Transport.bpm.value = 144;
+
 class FilterLoopedSound {
   player: Player;
   effect: Filter;
   constructor(
     url: string,
     $effect: Observable<number>,
-    type: "lowpass" | "highpass" = "lowpass"
+    type: "lowpass" | "highpass" = "lowpass",
+    duration = 4
   ) {
     this.player = new Player({
       url,
       loop: true,
-      autostart: true,
+      fadeIn: "0.25",
+      // autostart: false,
+      // loopStart: 0,
     });
     this.effect = new Tone.Filter(10, type).toDestination();
     this.player.connect(this.effect);
@@ -55,8 +60,16 @@ class FilterLoopedSound {
           this.effect.frequency.value = v;
         }
       });
+    this.player.sync().start(0);
+
+    // Tone.Transport.scheduleRepeat((time) => {
+    //   // use the callback time to schedule events
+    //   console.log("asdf");
+    //   this.player.start(0).stop("+4m");
+    // }, `${duration}m`);
     // this.player.chain(Tone.Destination);
-    this.player.seek(Date.now() % 140);
+    // this.player.seek(Date.now() % 140);
+    // this.player.start(0).stop(duration);
     // this.player.
     // setTimeout(() => this.player.start(0), 1000);
   }
@@ -80,7 +93,9 @@ export class SoundController {
           }
           return -1;
         })
-      )
+      ),
+      "lowpass",
+      4
     );
     // perc1.player.seek(Time.now)
     const perc1 = new FilterLoopedSound(
@@ -95,7 +110,9 @@ export class SoundController {
           }
           return -1;
         })
-      )
+      ),
+      "lowpass",
+      1
     );
     const perc2 = new FilterLoopedSound(
       perc1Sound,
@@ -109,7 +126,9 @@ export class SoundController {
           }
           return -1;
         })
-      )
+      ),
+      "lowpass",
+      1
     );
     const rim = new FilterLoopedSound(
       rimSound,
@@ -123,28 +142,41 @@ export class SoundController {
           }
           return -1;
         })
-      )
+      ),
+      "lowpass",
+      4
     );
     const subSimple = new FilterLoopedSound(
       subSimpleSound,
-      scene.$scene.pipe(map((scene) => scene - 3.5))
+      scene.$scene.pipe(map((scene) => scene - 3.5)),
+      "lowpass",
+      8
     );
     const subLLong = new FilterLoopedSound(
       subLLongSound,
-      scene.$scene.pipe(map((scene) => scene - 5.2))
+      scene.$scene.pipe(map((scene) => scene - 5.2)),
+      "lowpass",
+      8
     );
     const choir1 = new FilterLoopedSound(
       choir1Sound,
       scene.$scene.pipe(map((scene) => scene - 6.5)),
-      "highpass"
+      "highpass",
+      8
     );
     const fill = new FilterLoopedSound(
       fillSound,
       combineLatest([scene.$isAmplified, scene.$scene]).pipe(
         map(([amp, scene]) => (scene >= 4 && scene <= 5 ? -1 : amp))
-      )
+      ),
+      "lowpass",
+      2
       // map((v) => v),
     );
+
+    setTimeout(() => {
+      Tone.Transport.start();
+    }, 1000);
     // console.log(kick, perc1, perc2);
   }
 }

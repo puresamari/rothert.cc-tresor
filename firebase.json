@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "bunker-ab615",
     "public": "dist",
     "ignore": [
       "firebase.json",
