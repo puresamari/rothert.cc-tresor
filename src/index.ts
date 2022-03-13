@@ -40,8 +40,8 @@ function launchSound() {
   });
 }
 
-const cube = new Cube(document.querySelector("canvas#cube"), scene, 0);
-const cube2 = new Cube(document.querySelector("canvas#cube-2"), scene, 1);
+const cube = new Cube(document.querySelector("canvas#cube-2"), scene, 0);
+const cube2 = new Cube(document.querySelector("canvas#cube"), scene, 1);
 const hero = new Hero(document.querySelector("canvas#hero"), scene);
 
 // @ts-ignore

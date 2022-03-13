@@ -16,8 +16,13 @@ export class SceneController {
     return this.sceneSubject.getValue();
   }
 
-  public amplifiedSubject = new BehaviorSubject(-1);
-  public $isAmplified = this.amplifiedSubject.pipe(
+  public amplified1Subject = new BehaviorSubject(-1);
+  public $isAmplified1 = this.amplified1Subject.pipe(
+    distinctUntilChanged((a, b) => a === b)
+  );
+
+  public amplified2Subject = new BehaviorSubject(-1);
+  public $isAmplified2 = this.amplified2Subject.pipe(
     distinctUntilChanged((a, b) => a === b)
   );
 

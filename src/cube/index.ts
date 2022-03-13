@@ -13,7 +13,7 @@ import {
 } from "three";
 
 import { fromEvent, merge } from "rxjs";
-import { map, distinctUntilChanged, tap } from "rxjs/operators";
+import { map, distinctUntilChanged, tap, switchMap } from "rxjs/operators";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export class Cube {
@@ -60,12 +60,31 @@ export class Cube {
       fromEvent(canvas, "mousedown").pipe(map(() => 1)),
       fromEvent(canvas, "mouseup").pipe(map(() => 0.5)),
       fromEvent(canvas, "mouseleave").pipe(map(() => -1))
-    ).subscribe((v) => {
-      sceneCTL.amplifiedSubject.next(v);
-      canvas.style.transform = `translateY(-50%) scale(${
-        v < 0 ? 1 : 1 + v * 0.2
-      })`;
-    });
+    )
+      .pipe(
+        switchMap((v) =>
+          sceneCTL.$scene.pipe(
+            map((scene) => (scene > 0.75 && (scene < 4 || scene > 8) ? v : 0))
+          )
+        )
+      )
+      .subscribe((v) => {
+        (sceneCTL as any)[`amplified${variant + 1}Subject`].next(v);
+        canvas.style.transform = `translateY(-50%) scale(${
+          v < 0 ? 1 : 1 + v * 0.2
+        })`;
+      });
+
+    if (variant === 1) {
+      sceneCTL.$scene
+        .pipe(
+          map((v) => v < 7),
+          distinctUntilChanged((a, b) => a === b)
+        )
+        .subscribe((v) => {
+          canvas.style.display = v ? "none" : null;
+        });
+    }
 
     sceneCTL.$scene
       .pipe(
