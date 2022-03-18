@@ -39,6 +39,7 @@ export class SoundController {
           return -1;
         })
       ),
+      scene.$running,
       "lowpass",
       4
     );
@@ -56,6 +57,7 @@ export class SoundController {
           return -1;
         })
       ),
+      scene.$running,
       "lowpass",
       1
     );
@@ -72,6 +74,7 @@ export class SoundController {
           return -1;
         })
       ),
+      scene.$running,
       "lowpass",
       1
     );
@@ -88,6 +91,7 @@ export class SoundController {
           return -1;
         })
       ),
+      scene.$running,
       "lowpass",
       4
     );
@@ -96,6 +100,7 @@ export class SoundController {
       combineLatest([scene.$isAmplified1, scene.$scene]).pipe(
         map(([amp, scene]) => (scene >= 4 ? -1 : amp))
       ),
+      scene.$running,
       "lowpass",
       2
       // map((v) => v),
@@ -105,48 +110,56 @@ export class SoundController {
     const kick2 = new FilterLoopedSound(
       kick2Sound,
       scene.$scene.pipe(map((scene) => scene - 10.5)),
+      scene.$running,
       "lowpass",
       8
     );
     const subSimple = new FilterLoopedSound(
       subSimpleSound,
       scene.$scene.pipe(map((scene) => scene - 3.5)),
+      scene.$running,
       "lowpass",
       8
     );
     const subLLong = new FilterLoopedSound(
       subLLongSound,
       scene.$scene.pipe(map((scene) => scene - 5.2)),
+      scene.$running,
       "lowpass",
       8
     );
     const choir1 = new FilterLoopedSound(
       choir1Sound,
       scene.$scene.pipe(map((scene) => scene - 6.5)),
+      scene.$running,
       "highpass",
       8
     );
     const arpeggio = new FilterLoopedSound(
       arpeggioSound,
       scene.$scene.pipe(map((scene) => scene - 12)),
+      scene.$running,
       "lowpass",
       8
     );
     const vocalHarmony = new FilterLoopedSound(
       vocalHarmonySound,
       scene.$scene.pipe(map((scene) => scene - 8)),
+      scene.$running,
       "lowpass",
       8
     );
     const perc21 = new FilterLoopedSound(
       perc21Sound,
       scene.$scene.pipe(map((scene) => scene - 10)),
+      scene.$running,
       "lowpass",
       8
     );
     const perc22 = new FilterLoopedSound(
       perc22Sound,
       scene.$scene.pipe(map((scene) => scene - 9)),
+      scene.$running,
       "lowpass",
       8
     );
@@ -155,6 +168,7 @@ export class SoundController {
       combineLatest([scene.$isAmplified2, scene.$scene]).pipe(
         map(([amp, scene]) => (scene < 6 ? -1 : amp))
       ),
+      scene.$running,
       "highpass",
       8
     );
@@ -163,6 +177,7 @@ export class SoundController {
       combineLatest([scene.$isAmplified1, scene.$scene]).pipe(
         map(([amp, scene]) => (scene < 6 ? -1 : amp))
       ),
+      scene.$running,
       "highpass",
       8
     );

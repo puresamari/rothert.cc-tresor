@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { combineLatest, Observable } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import * as Tone from "tone";
 import { Filter, Player } from "tone";
@@ -11,6 +11,7 @@ export class FilterLoopedSound {
   constructor(
     url: string,
     $effect: Observable<number>,
+    $playing: Observable<number>,
     type: "lowpass" | "highpass" = "lowpass",
     duration = 4
   ) {
@@ -23,8 +24,9 @@ export class FilterLoopedSound {
     });
     this.effect = new Tone.Filter(10, type).toDestination();
     this.player.connect(this.effect);
-    $effect
+    combineLatest([$effect, $playing])
       .pipe(
+        map(([v, playing]) => (playing === 0 ? -1 : v * playing)),
         ease(120, 18),
         map((v) => {
           if (v < 0) {

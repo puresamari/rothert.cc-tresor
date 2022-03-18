@@ -26,6 +26,12 @@ export class SceneController {
     distinctUntilChanged((a, b) => a === b)
   );
 
+  $end = this.$scene.pipe(
+    map((v) => Math.min(1, Math.max(v - 18, 0))),
+    distinctUntilChanged((a, b) => a === b)
+  );
+  $running = this.$end.pipe(map((v) => 1 - v));
+
   private beatFraction = (1000 * 60) / 140;
   public $beat = timer(0, 1000 / 60).pipe(map(() => this.Beat));
 
