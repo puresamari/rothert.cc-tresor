@@ -47,13 +47,14 @@ export class Cube {
     this.orbit.enablePan = false;
     this.orbit.enableDamping = true;
     this.orbit.enableRotate = false;
+    this.orbit.enabled = false;
     this.orbit.autoRotate = true;
     this.orbit.target = new Vector3(0);
 
     this.renderer = new WebGLRenderer({ canvas, alpha: true });
     this.renderer.setSize(width, height);
 
-    this.cube = new Anim(sceneCTL);
+    this.cube = new Anim(sceneCTL, variant);
     const cube = new Mesh(this.cube, new MeshNormalMaterial({}));
     this.scene.add(cube);
     this.camera.position.z = 10;
@@ -61,6 +62,7 @@ export class Cube {
     this.camera.position.y = 5;
     this.camera.lookAt(0, 0, 0);
     this.update();
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
     combineLatest([
       fromEvent(canvas, "contextmenu").pipe(
         scan((v) => !v, false),

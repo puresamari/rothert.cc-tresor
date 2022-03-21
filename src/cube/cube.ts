@@ -23,7 +23,10 @@ export class Anim extends SphereBufferGeometry {
   uv: BufferAttribute;
   amplification = 0;
 
-  constructor(private sceneCTL: SceneController) {
+  constructor(
+    private sceneCTL: SceneController,
+    public readonly variant: number
+  ) {
     super(3, 50, 50);
     this.pos = this.attributes.position as BufferAttribute;
     this.posOrig = this.pos.clone();
@@ -53,7 +56,10 @@ export class Anim extends SphereBufferGeometry {
         ty *
           Math.min(3, 1 + Math.abs((((tx - x) / (2.3 - this.mode)) * 2) / 10)) *
           scene1 -
-          scene2 * Math.sin(this.mode)
+          scene2 *
+            Math[this.variant ? "sin" : "cos"](
+              Math.min(this.mode + beatOrig * 0.5, Math.PI * 5.8)
+            )
       );
       this.pos.setX(
         i,
@@ -65,7 +71,8 @@ export class Anim extends SphereBufferGeometry {
       );
       this.pos.setZ(
         i,
-        tz * (1 + Math.pow(beat, 2) * Math.max(0, scene1 / 2 - 0.25))
+        tz * (1 + Math.pow(beat, 2) * Math.max(0, scene1 / 2 - 0.25)) +
+          scene2 * (this.variant ? beat : 1 - beat) * 0.01 * tz * running
       );
     }
     this.pos.needsUpdate = true;

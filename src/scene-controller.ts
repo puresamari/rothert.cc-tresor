@@ -1,5 +1,5 @@
 import { BehaviorSubject, fromEvent, interval, Observable, timer } from "rxjs";
-import { map, distinctUntilChanged, tap } from "rxjs/operators";
+import { map, distinctUntilChanged, tap, startWith } from "rxjs/operators";
 
 export class SceneController {
   start: number = -1;
@@ -31,6 +31,12 @@ export class SceneController {
     distinctUntilChanged((a, b) => a === b)
   );
   $running = this.$end.pipe(map((v) => 1 - v));
+
+  public $isMobile = fromEvent(window, "resize").pipe(
+    startWith(window.innerWidth),
+    map(() => window.innerWidth < 1024),
+    distinctUntilChanged((a, b) => a === b)
+  );
 
   private beatFraction = (1000 * 60) / 140;
   public $beat = timer(0, 1000 / 60).pipe(map(() => this.Beat));
