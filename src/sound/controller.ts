@@ -109,56 +109,66 @@ export class SoundController {
 
     const kick2 = new FilterLoopedSound(
       kick2Sound,
-      scene.$scene.pipe(map((scene) => scene - 10.5)),
+      scene.$scene.pipe(
+        map((scene) => (scene < 15 ? scene - 10.5 : 18.5 - scene))
+      ),
       scene.$running,
       "lowpass",
       8
     );
     const subSimple = new FilterLoopedSound(
       subSimpleSound,
-      scene.$scene.pipe(map((scene) => scene - 3.5)),
+      scene.$scene.pipe(
+        map((scene) => (scene < 16 ? scene - 3.5 : 17.5 - scene))
+      ),
       scene.$running,
       "lowpass",
       8
     );
     const subLLong = new FilterLoopedSound(
       subLLongSound,
-      scene.$scene.pipe(map((scene) => scene - 5.2)),
+      scene.$scene.pipe(
+        map((scene) => (scene < 15 ? scene - 5.2 : 19 - scene))
+      ),
       scene.$running,
       "lowpass",
       8
     );
     const choir1 = new FilterLoopedSound(
       choir1Sound,
-      scene.$scene.pipe(map((scene) => scene - 6.5)),
+      scene.$scene.pipe(
+        map((scene) => (scene < 15 ? scene - 6.5 : 17.5 - scene))
+      ),
       scene.$running,
       "highpass",
       8
     );
     const arpeggio = new FilterLoopedSound(
       arpeggioSound,
-      scene.$scene.pipe(map((scene) => scene - 12)),
+      scene.$scene.pipe(map((scene) => (scene < 16 ? scene - 12 : 18 - scene))),
       scene.$running,
       "lowpass",
       8
     );
     const vocalHarmony = new FilterLoopedSound(
       vocalHarmonySound,
-      scene.$scene.pipe(map((scene) => scene - 8)),
+      scene.$scene.pipe(map((scene) => (scene < 15 ? scene - 8 : 17 - scene))),
       scene.$running,
       "lowpass",
       8
     );
     const perc21 = new FilterLoopedSound(
       perc21Sound,
-      scene.$scene.pipe(map((scene) => scene - 10)),
+      scene.$scene.pipe(map((scene) => (scene < 12 ? scene - 10 : 16 - scene))),
       scene.$running,
       "lowpass",
       8
     );
     const perc22 = new FilterLoopedSound(
       perc22Sound,
-      scene.$scene.pipe(map((scene) => scene - 9)),
+      scene.$scene.pipe(
+        map((scene) => (scene < 12 ? scene - 9 : 16.5 - scene))
+      ),
       scene.$running,
       "lowpass",
       8
