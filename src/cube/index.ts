@@ -1,27 +1,23 @@
-import { SceneController } from "./../scene-controller";
-import { Anim } from "./cube";
+import { combineLatest, fromEvent, merge, of } from "rxjs";
 import {
-  BoxBufferGeometry,
+  distinctUntilChanged,
+  map,
+  scan,
+  startWith,
+  switchMap,
+} from "rxjs/operators";
+import {
+  Clock,
   Mesh,
-  MeshBasicMaterial,
   MeshNormalMaterial,
-  MeshPhongMaterial,
+  Object3D,
   PerspectiveCamera,
   Scene,
-  Vector3,
   WebGLRenderer,
 } from "three";
 
-import { combineLatest, fromEvent, merge, of } from "rxjs";
-import {
-  map,
-  distinctUntilChanged,
-  tap,
-  switchMap,
-  startWith,
-  scan,
-} from "rxjs/operators";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { SceneController } from "./../scene-controller";
+import { Anim } from "./cube";
 
 export class Cube {
   scene = new Scene();
@@ -29,7 +25,10 @@ export class Cube {
   cubeMat: Anim;
   renderer: WebGLRenderer;
   camera: PerspectiveCamera;
-  orbit: OrbitControls;
+  cameraAnchor = new Object3D();
+  autoRotateSpeed = 0;
+  clock = new Clock();
+  // orbit: OrbitControls;
 
   size = [window.innerHeight / 2, window.innerHeight];
 
@@ -42,21 +41,27 @@ export class Cube {
 
     this.camera = new PerspectiveCamera(75, width / height, 0.1, 1000);
 
-    this.orbit = new OrbitControls(this.camera, this.canvas);
-    this.orbit.enableZoom = false;
-    this.orbit.enablePan = false;
-    this.orbit.enableDamping = true;
-    this.orbit.enableRotate = false;
-    this.orbit.enabled = false;
-    this.orbit.autoRotate = true;
-    this.orbit.target = new Vector3(0);
+    // this.orbit = new OrbitControls(this.camera, this.canvas);
+    // this.orbit.enableZoom = false;
+    // this.orbit.enablePan = false;
+    // this.orbit.enableDamping = true;
+    // this.orbit.enableRotate = false;
+    // this.orbit.enabled = false;
+    // this.orbit.autoRotate = true;
+    // this.orbit.target = new Vector3(0);
 
-    this.renderer = new WebGLRenderer({ canvas, alpha: true });
+    this.renderer = new WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: window.innerWidth >= 768,
+    });
     this.renderer.setSize(width, height);
 
     this.cube = new Anim(sceneCTL, variant);
     const cube = new Mesh(this.cube, new MeshNormalMaterial({}));
     this.scene.add(cube);
+    this.scene.add(this.cameraAnchor);
+    this.cameraAnchor.add(this.camera);
     this.camera.position.z = 10;
     this.camera.position.x = 5;
     this.camera.position.y = 5;
@@ -98,11 +103,12 @@ export class Cube {
     if (variant === 1) {
       sceneCTL.$scene
         .pipe(
-          map((v) => v < 7 && v > 18),
+          map((v) => v < 7),
           distinctUntilChanged((a, b) => a === b)
         )
         .subscribe((v) => {
-          canvas.style.display = v ? "none" : null;
+          // console.log(v);
+          canvas.style.display = v ? "none" : "block";
         });
     }
 
@@ -143,16 +149,20 @@ export class Cube {
       .pipe(distinctUntilChanged((a, b) => a === b))
       .subscribe((v) => {
         console.log(v, Math.max(-v, Math.min(0, 9 - v) * 18));
-        this.orbit.autoRotateSpeed =
+        this.autoRotateSpeed =
           (v + Math.max(-v + 1, Math.min(0, 9 - v) * 18)) * 10;
         this.cube.mode = v;
       });
   }
 
   update() {
-    this.orbit.update();
+    let d = this.clock.getDelta();
+    let t = this.clock.getElapsedTime();
+    // this.orbit.update();
+    // console.log(d);
+    this.cameraAnchor.rotateY(d * 0.05 * this.autoRotateSpeed);
     this.renderer.render(this.scene, this.camera);
-    this.cube.update();
+    this.cube.update(t);
     requestAnimationFrame(() => this.update());
   }
 }

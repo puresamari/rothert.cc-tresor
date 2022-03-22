@@ -12,8 +12,6 @@ import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise.js";
 import * as math from "mathjs";
 import { SceneController } from "../scene-controller";
 
-let clock = new Clock();
-
 export class Anim extends SphereBufferGeometry {
   mode = 0;
   perlin = new ImprovedNoise();
@@ -33,8 +31,7 @@ export class Anim extends SphereBufferGeometry {
     this.uv = this.attributes.uv as BufferAttribute;
   }
 
-  update() {
-    let t = clock.getElapsedTime();
+  update(t: number) {
     const y = Math.sin(t);
     const x = Math.cos(t);
     const scene1 = Math.min(
