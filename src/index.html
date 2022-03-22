@@ -22,9 +22,11 @@
   <div class="h-screen w-full bg-black relative z-40">
     <canvas id="hero" class="absolute left-0 top-0 w-full h-full pointer-events-none"></canvas>
   </div>
-  <button id="start" class="fixed top-0 left-0 w-full h-full bg-black flex flex-col justify-center items-center z-50">
+  <button id="start"
+    class="fixed top-0 left-0 w-full h-full bg-black flex flex-col justify-center items-center z-50 p-8">
     <img src="<%= require('./music_off.svg') %>" class="w-12 h-12 mb-8">
     <p class="uppercase text-4xl">Click to turn on your sound and enter and start scrolling</p>
+    <p class="uppercase text-4xl mt-6 lg:hidden">Make sure your device is not on silent mode!</p>
   </button>
   <div class="h-[25vh] w-full relative"> </div>
   <div class="max-w-7xl px-4 w-full mx-auto text-xl uppercase font-bold">
